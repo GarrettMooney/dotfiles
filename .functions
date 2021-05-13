@@ -1,0 +1,123 @@
+# 5 functions added by Garrett on 7/7/2015
+# make directory and cd to it in one function
+mcd() 
+{
+    mkdir -p $1
+    cd $1
+}
+# inspect head & tail (meant for csv)
+i()
+{
+    (head -n 5; tail -n 5) < "$1"
+}
+# create a pdf for a Unix/Linux man page
+man2pdf() 
+{
+    man -t $1 | ps2pdf - > $1.pdf
+}
+
+# update julia packages
+# usage: jl_up
+jl_up() { julia -e "using Pkg; Pkg.update()" }
+
+# precompile julia packages
+# usage: jl_pc
+jl_pc() { julia -e "using Pkg; Pkg.precompile()" }
+
+# install library from CRAN using all cpus
+# usage: r_install ggplot2
+r_install() { Rscript -e "try(install.packages('$1', Ncpus = parallel::detectCores(), repos = 'https://cloud.r-project.org/', local = FALSE))" }
+
+# install script from github using all cpus
+# usage: r_install_github tidyverse/tidyverse
+r_install_github() { Rscript -e "try(remotes::install_github('$1', threads = parallel::detectCores(), local = FALSE, force = TRUE))" }
+
+# install script from github using all cpus
+# usage: r_install_github_url https://github.com/tidyverse/tidyverse
+r_install_github_url() { 
+  pkg=$(gh_pkg $1)
+  r_install_github $pkg
+}
+
+# update R github packages
+# usage: r_up_gh
+r_up_gh() { Rscript -e "try(moonmisc::update_github())" }
+
+# update R packages
+# usage: r_up
+r_up() { Rscript -e "try(update.packages(Ncpus = parallel::detectCores(), repos = 'https://cloud.r-project.org/'))" }
+
+# extract user/package from github url
+# usage: gh_pkg https://github.com/ledell/subsemble
+gh_pkg() { echo "$1" | sed "s#https://github.com/##" }
+
+# r pkg installer
+# inputs: packagename or username/packagename or https://github.com/username/packagename
+rinstall() { 
+  if [[ "$1" == *"github.com"* ]]; then
+    pkg=$(gh_pkg $1)
+    r_install_github $pkg
+  elif [[ "$1" == *"/"* ]]; then
+    r_install_github $1
+  else
+    r_install $1
+  fi
+}
+
+# venv
+# usage:
+#   $ venv .recsys
+function venv {
+    default_envdir=".env"
+    envdir=${1:-$default_envdir}
+
+    if [ ! -d $envdir ]; then
+        python3.9 -m virtualenv -p python3.9 $envdir
+        echo -e "\x1b[38;5;2m✔ Created virtualenv $envdir\x1b[0m"
+        source $envdir/bin/activate
+        echo -e "\x1b[38;5;2m✔ Activated virtualenv $envdir\x1b[0m"
+        pip install ipython ipykernel jupyter jupyterlab black flake8
+        echo -e "\x1b[38;5;2m✔ Installed packages \x1b[0m"
+	python -m ipykernel install --user --name=$envdir --display-name="Python 3.9 ($envdir)"
+        echo -e "\x1b[38;5;2m✔ Created kernel 'Python3.7 ($envdir)'\x1b[0m"
+	export PYTHONPATH=$(pwd)
+    fi
+    
+    if [ -d $envdir ]; then
+        source $envdir/bin/activate
+        echo -e "\x1b[38;5;2m✔ Activated virtualenv $envdir\x1b[0m"
+	export PYTHONPATH=$(pwd)
+    fi
+
+    python --version
+}
+
+# usage:
+#   $ venv_lite .recsys
+function venv_lite {
+    default_envdir=".env"
+    default_pyversion="3.9"
+    envdir=${1:-$default_envdir}
+    pyversion=${2:-$default_pyversion}
+
+    if [ ! -d $envdir ]; then
+        python$pyversion -m virtualenv -p python$pyversion $envdir
+        echo -e "\x1b[38;5;2m✔ Created virtualenv $envdir\x1b[0m"
+        source $envdir/bin/activate
+        echo -e "\x1b[38;5;2m✔ Activated virtualenv $envdir\x1b[0m"
+        pip install ipython ipykernel jupyter jupyterlab
+        echo -e "\x1b[38;5;2m✔ Installed packages \x1b[0m"
+	python -m ipykernel install --user --name=$envdir --display-name="Python ($envdir)"
+        echo -e "\x1b[38;5;2m✔ Created kernel 'Python$pyversion ($envdir)'\x1b[0m"
+	export PYTHONPATH=$(pwd)
+    fi
+    
+    if [ -d $envdir ]; then
+        source $envdir/bin/activate
+        echo -e "\x1b[38;5;2m✔ Activated virtualenv $envdir\x1b[0m"
+	export PYTHONPATH=$(pwd)
+    fi
+
+    python --version
+}
+

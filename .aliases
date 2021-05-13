@@ -1,10 +1,18 @@
+# general
 alias _='sudo'
 alias e='exit'
+alias k=kubectl
+alias p=python
+
+# directory listing
 alias l='ls'
 alias lt='ls -lt'
+
+# root navigations
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
+alias .....="cd ../../../.."
 alias mi="mk -i"
 alias h='function hdi(){ howdoi $* -c -n 5;  }; hdi'
 alias histg='history | grep'
@@ -26,8 +34,9 @@ alias restart='sudo shutdown -r now' #requires password, disable it by "sudo chm
 alias suspend='sudo pm-suspend'
 alias lock='gnome--screensaver-comand --lock'
 
-# dotfiles
-alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+# refresh terminal
+alias so="source ~/.zshrc"
+
 
 # editing
 alias ea='vim ~/.zsh_aliases'
@@ -35,6 +44,11 @@ alias eb='vim ~/.bashrc'
 alias et='vim ~/.tmux.conf'
 alias ev='vim ~/.vimrc'
 alias ez='vim ~/.zshrc'
+
+# tmux
+alias t=tmux
+alias tns="tmux new -s "
+alias tls="tmux ls"
 
 #timer for reading
 alias rt='time (read)' # requires Ctrl+D or ENTER to stop timer
@@ -63,23 +77,15 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # analysis aliases
 alias U="awk '!a[\$0]++'"
 
-# 5 functions added by Garrett on 7/7/2015
-# make directory and cd to it in one function
-mcd() 
-{
-    mkdir -p $1
-    cd $1
-}
-# inspect head & tail (meant for csv)
-i()
-{
-    (head -n 5; tail -n 5) < "$1"
-}
-# create a pdf for a Unix/Linux man page
-man2pdf() 
-{
-    man -t $1 | ps2pdf - > $1.pdf
-}
+# print each PATH entry on a separate line
+alias path='echo -e ${PATH//:/\\n}'
 
+# thingskatedid
 alias icat="kitty icat --align=left"
 alias isvg="rsvg-convert | icat"
+
+# dotfiles
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+
+# lazydockr
+alias lzd='lazydocker'

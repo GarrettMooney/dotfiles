@@ -1,0 +1,149 @@
+# thingskatedid style prompt
+PS1='%(?.%(!.#.;).%F{6}%B;%b%f) '
+
+#'rm *' sanity check
+setopt RM_STAR_WAIT
+
+# tab-completion
+autoload -U compinit
+compinit
+
+# better looking completion style
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
+
+# command correction
+setopt correctall
+
+# allows Bash style comments on command line
+setopt interactivecomments
+
+# more globbing
+setopt extendedglob
+
+# spelling corrector
+setopt CORRECT
+
+# get fasd working
+eval "$(fasd --init posix-alias zsh-hook)"
+
+# might be redundant b/c of version in .bashrc
+fasd_cache="$HOME/.fasd-init-zsh"
+if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
+    fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install >| "$fasd_cache"
+fi
+source "$fasd_cache"
+unset fasd_cache
+
+# 2015-07-27
+# Dr. Bunsen
+# add vim support in zsh
+
+# vi style incrmental search
+bindkey '^R' history-incremental-search-backward
+bindkey -M viins \C-R history-incremental-search-backward
+bindkey -M vicmd \C-R history-incremental-search-backward
+# bindkey '^S' history-incremental-search-forward
+# bindkey '^P' history-search-backward
+# bindkey '^N' history-search-forward
+
+# move inside a directory w/out cd
+setopt AUTO_CD
+
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
+#ZSH_THEME="philips"
+ZSH_THEME=""
+
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to use hyphen-insensitive completion. Case
+# sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment the following line to disable bi-weekly auto-update checks.
+# DISABLE_AUTO_UPDATE="true"
+
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git poetry web-search vi-mode zsh-autosuggestions) # NB: vi-mode and virtualenv are incompatible
+# plugins=(git web-search virtualenv)
+
+ZSH_DISABLE_COMPFIX="true" # ignore insecure directories
+source $ZSH/oh-my-zsh.sh
+
+# Powerline-shell
+# if [[ -r /usr/share/powerline/bindings/zsh/powerline.zsh ]]; then
+#     source /usr/share/powerline/bindings/zsh/powerline.zsh
+# fi
+
+# Zsh autocompletion of teamocil
+compctl -g '~/.teamocil/*(:t:r)' teamocil
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# capslock remap
+setxkbmap -option ctrl:nocaps
+xcape -e 'Control_L=Escape'
+
+# zsh syntax highlighting
+source $HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# thefuck
+eval $(thefuck --alias)
+
+# purescript
+# NB: must be AFTER `source $ZSH/oh-my-zsh.sh`
+# fpath+=("$HOME/.zsh/pure")
+# autoload -U promptinit; promptinit
+# prompt pure
+
+# virtualenv for pure prompt
+# source /usr/local/lib/node_modules/pure-prompt/pure.zsh
+
+# nvm
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# starship
+# eval $(starship init zsh)
+
+# kitty
+autoload -Uz compinit
+compinit
+kitty + complete setup zsh | source /dev/stdin
