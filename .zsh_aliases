@@ -1,0 +1,85 @@
+alias _='sudo'
+alias e='exit'
+alias l='ls'
+alias lt='ls -lt'
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias mi="mk -i"
+alias h='function hdi(){ howdoi $* -c -n 5;  }; hdi'
+alias histg='history | grep'
+alias hn='stack exec jupyter -- notebook'
+alias m='f -e vlc'
+alias d='fasd -d'
+alias o='a -e xdg-open'
+alias jl='jupyter lab'
+alias jn='jupyter notebook'
+alias pu='pushd'
+alias po='popd'
+alias e='exit'
+# alias v='f -e vim'
+alias vtop='vtop --theme monokai'
+alias fhere='find -iname '
+alias igrep='grep -i'
+alias shutdown='sudo shutdown -h now' #requires password, disable it by "sudo chmod u+s /sbin/shutdown"
+alias restart='sudo shutdown -r now' #requires password, disable it by "sudo chmod u+s /sbin/shutdown"
+alias suspend='sudo pm-suspend'
+alias lock='gnome--screensaver-comand --lock'
+
+# dotfiles
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+
+# editing
+alias ea='vim ~/.zsh_aliases'
+alias eb='vim ~/.bashrc'
+alias et='vim ~/.tmux.conf'
+alias ev='vim ~/.vimrc'
+alias ez='vim ~/.zshrc'
+
+#timer for reading
+alias rt='time (read)' # requires Ctrl+D or ENTER to stop timer
+
+#sudo stuff
+alias agu='sudo apt-get update'
+alias agupgrade='sudo apt-get upgrade'
+alias agupgradef='sudo apt-get update; sudo apt-get upgrade'
+alias agi='sudo apt-get install'
+alias agr='sudo apt-get remove'
+alias agautor='sudo apt-get autoremove'
+alias agautoclean='sudo apt-get autoclean'
+alias agsearch='apt-cache search'
+
+# open file  using default app xdg-open
+alias open='xdg-open'
+# some more ls aliases
+alias ll='ls -alF'
+alias lt='ls -altF'
+alias la='ls -A'
+alias lh='ls --color -h --group-directories-first'
+alias l='ls -CF'
+
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# analysis aliases
+alias U="awk '!a[\$0]++'"
+
+# 5 functions added by Garrett on 7/7/2015
+# make directory and cd to it in one function
+mcd() 
+{
+    mkdir -p $1
+    cd $1
+}
+# inspect head & tail (meant for csv)
+i()
+{
+    (head -n 5; tail -n 5) < "$1"
+}
+# create a pdf for a Unix/Linux man page
+man2pdf() 
+{
+    man -t $1 | ps2pdf - > $1.pdf
+}
+
+alias icat="kitty icat --align=left"
+alias isvg="rsvg-convert | icat"
