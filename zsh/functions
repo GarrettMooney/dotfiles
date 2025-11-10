@@ -1,0 +1,180 @@
+increaseWatchers() {
+    sudo sysctl fs.inotify.max_user_watches=65536
+}
+
+die () {
+    echo >&2 "$@"
+}
+
+
+addToPath() {
+    if [[ "$PATH" != *"$1"* ]]; then
+        export PATH=$PATH:$1
+    fi
+}
+
+
+addToPathFront() {
+    if [[ "$PATH" != *"$1"* ]]; then
+        export PATH=$1:$PATH
+    fi
+}
+
+catr() {
+    tail -n "+$1" $3 | head -n "$(($2-$1+1))"
+}
+
+# do all the brew stuff
+type brew >/dev/null 2>&1 && alias brewer='brew update && brew upgrade && brew cleanup && brew doctor'
+
+# list images
+type docker >/dev/null 2>&1 && alias dl="docker ps -a"
+
+# remove all containers and images
+type docker >/dev/null 2>&1 && alias drm="docker system prune -a"
+
+# use eza if installed
+lc() {
+    if hash eza 2>/dev/null; then
+        eza -1
+    else
+        ls -1
+    fi
+}
+
+# bootstrap
+#   - copy ~/git/bootstrap/bootstrap and ~/git/bootstrap/requirements.txt the to current directory.
+#   - first arg is the venv and kernel name
+bootstrap() {
+    # make sure an arg is passed
+    if [ $# -eq 0 ]; then
+        echo "Error: Please provide an argument to replace 'VENV'"
+        return 1
+    fi
+
+    # Check if files exist
+    if [ ! -f ~/git/bootstrap/bootstrap ] || [ ! -f ~/git/bootstrap/requirements.txt ]; then
+        echo "Error: Files ~/git/bootstrap/bootstrap or ~/git/bootstrap/requirements.txt do not exist"
+        return 1
+    fi
+
+    local replacement="$1"
+
+    # Copy files and replace 'VENV'
+    cp ~/git/bootstrap/bootstrap ./
+    cp ~/git/bootstrap/requirements.txt ./
+    sed -i '' "s/VENV/$replacement/g" bootstrap
+
+    echo "Files copied and 'VENV' replaced with '$replacement'"
+}
+
+# BurntSushi
+paths() {
+    echo "$1" | sed 's/:/\n/g'
+}
+
+nh() {
+    nohup "$@" > /dev/null 2>&1 &
+}
+
+mkcd() {
+    mkdir -p "$1" && cd "$1" || exit
+}
+
+prependpath() {
+    paths="$1"
+    toadd="$2"
+    case ":$paths:" in
+        *:"$toadd":*)
+            echo "$paths"
+            ;;
+        *)
+            echo "$toadd${paths:+:$paths}"
+            ;;
+    esac
+}
+
+appendpath() {
+    paths="$1"
+    toadd="$2"
+    case ":$paths:" in
+        *:"$toadd":*)
+            echo "$paths"
+            ;;
+        *)
+            echo "${paths:+$paths:}$toadd"
+            ;;
+    esac
+}
+
+rgf() {
+    regex=
+    args=
+    for v in "$@"; do
+        case $v in
+            -*) args+="$v" ;;
+            *) regex="$v" ;;
+        esac
+    done
+    rg --files $args | rg "$regex"
+}
+
+o() {
+  files="$(fzf --print0 --preview "bat --theme ansi --color always {}")"
+  if [ -z "$files" ]; then
+    return
+  fi
+  echo -n "$files" | xargs -0 -o "$EDITOR"
+}
+
+todo() {
+    if [[ -e TODO.md ]]; then
+        nvim TODO.md
+    else
+        nvim ~/git/todo/TODO.md
+    fi
+}
+
+json2yaml() {
+    jq . "$1" | yq eval -P
+}
+
+createprivaterepo() {
+  dirname=$(basename `pwd`)
+  gh_user=$(gh api user -q .login)
+  gh repo create $gh_user/$dirname --private --source=. --remote=upstream
+}
+
+createpublicrepo() {
+  dirname=$(basename `pwd`)
+  gh_user=$(gh api user -q .login)
+  gh repo create $gh_user/$dirname --public --source=. --remote=upstream
+}
+
+listkernels() {
+    uv run --with jupyter jupyter kernelspec list
+}
+
+removekernel() {
+    uv run --with jupyter jupyter kernelspec uninstall $1
+}
+
+# run script with uv
+# log stdout -> stdout.log
+# log stderr -> stderr.log
+# stream output
+uvlog() {
+  local script="$1"
+  shift
+  uv run "$script" "$@" > >(tee stdout.log) 2> >(tee stderr.log >&2)
+}
+
+# stop and remove all running containers
+dockercleanup() {
+    docker stop $(docker ps -q)
+    docker rm $(docker ps -aq)
+}
+
+ollama_sort_by_size () {
+    ollama list | tr -s ' ' | cut -d ' ' -f 1-3 | tr ' ' ',' | duckdb -c "select name, size from read_csv_auto('/dev/stdin') order by size desc"
+}

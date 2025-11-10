@@ -1,0 +1,12 @@
+# Ignore sensitive files
+.tokens
+
+# Ignore OS files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Ignore backup files
+*.backup
+*.bak

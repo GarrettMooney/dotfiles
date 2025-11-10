@@ -1,0 +1,26 @@
+# Template for ~/.tokens
+# Copy this file to ~/.tokens and fill in your actual values
+# DO NOT commit your actual .tokens file!
+
+# API Keys
+export ANTHROPIC_API_KEY="your-anthropic-api-key"
+export OPENAI_API_KEY="your-openai-api-key"
+export GEMINI_API_KEY="your-gemini-api-key"
+
+# AWS
+export AWS_SANDBOX_ACCOUNT_NUMBER="your-account-number"
+
+# Azure DevOps
+export AZURE_DEVOPS_ORG="https://dev.azure.com/your-org"
+export AZURE_DEVOPS_PROJECT="your-project"
+export AZURE_DEVOPS_EXT_PAT="your-pat-token"
+
+# GCP
+export VERTEX_PROJECT_ID="your-project-id"
+export VERTEX_LOCATION="your-location"
+
+# GitHub
+# export GITHUB_TOKEN="your-github-token"
+
+# Other tokens
+# Add any other sensitive environment variables here

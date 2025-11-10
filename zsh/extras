@@ -1,0 +1,92 @@
+source $ZSH/oh-my-zsh.sh
+
+PS1='%(?.%(!.#.;).%F{6}%B;%b%f) '
+
+set -o vi
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000000
+SAVEHIST=10000000
+setopt BANG_HIST
+setopt EXTENDED_HISTORY
+setopt INC_APPEND_HISTOry
+setopt SHARE_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
+setopt HIST_BEEP
+
+# 'rm *' sanity check
+setopt RM_STAR_WAIT
+
+# tab-completion
+autoload -U compinit
+compinit
+
+# better looking completion style
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
+
+# command correction
+setopt correctall
+
+# allows Bash style comments on command line
+setopt interactivecomments
+
+# more globbing
+setopt extendedglob
+
+# spelling corrector
+setopt CORRECT
+
+# vi style incremental search
+bindkey '^R' history-incremental-search-backward
+bindkey -M viins \C-R history-incremental-search-backward
+bindkey -M vicmd \C-R history-incremental-search-backward
+
+# move inside a directory w/out cd
+setopt AUTO_CD
+
+# zsh autocompletion of teamocil
+compctl -g '~/.teamocil/*(:t:r)' teamocil
+
+# thefuck
+eval $(thefuck --alias --enable-experimental-instant-mode)
+
+# zoxide
+eval "$(zoxide init zsh)"
+
+autoload -U +X bashcompinit && bashcompinit
+
+# fzf
+source <(fzf --zsh)
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+nvm use 22
+
+# set config for fzf
+export FZF_DEFAULT_COMMAND="rg --files"
+export FZF_DEFAULT_OPTS="
+  --color light
+  --multi
+  --height 40% --border
+  --bind tab:down
+  --bind shift-tab:up
+  --bind ctrl-x:toggle
+  --bind ctrl-s:toggle-all
+"
+
+# Set default theme for bat
+export BAT_THEME=ansi
+
+# Personal variables
+export EMAIL="garrettrmooney@gmail.com"

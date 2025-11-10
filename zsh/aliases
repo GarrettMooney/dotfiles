@@ -1,0 +1,68 @@
+# common
+alias _="sudo"
+alias e="exit"
+alias fhere="find -iname "
+alias h="history"
+alias histg="history | grep"
+alias igrep="grep -i"
+alias jl="jupyter lab"
+alias jn="jupyter notebook"
+alias l="ls"
+alias mi="mk -i"
+alias vtop="vtop --theme monokai"
+
+# from BurntSushi
+alias ports="lsof -iTCP -sTCP:LISTEN -n -P"
+alias less="less -R"
+alias grep="grep --color=auto"
+alias egrep="egrep --color=auto"
+alias fgrep="fgrep --color=auto"
+
+# git
+alias g="git"
+alias ga="g add"
+alias gc="g commit"
+alias gcmsg="g commit -m"
+alias gco="g checkout"
+alias gd="g diff"
+alias glo="g log --oneline"
+alias gm="g merge"
+alias gr="g rebase"
+alias gs="g status"
+alias gst="g status"
+alias gw="g worktree"
+alias gp="g push home main && g push origin main"
+alias gpt="g push home main --tags && g push origin main --tags"
+
+# directory mgmt
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias po="popd"
+alias pu="pushd"
+
+# editing
+alias ea="vim ~/.aliases"
+alias et="vim ~/.tmux.conf"
+alias ez="vim ~/.zshrc"
+alias v="vim ."
+
+# tmux
+alias t="tmux"
+alias tat="tmux attach -t"
+alias tks="tmux kill-session -t"
+alias tls="tmux ls"
+alias tns="tmux new -s "
+
+# dotfiles
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+
+# lazydockr
+# alias lzd="lazydocker"
+
+# primagen
+VIM="nvim"
+alias vim="$VIM"
+
+# justfiles
+alias kmd="just -g"
