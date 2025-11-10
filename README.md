@@ -61,14 +61,14 @@ Personal dotfiles for zsh, tmux, neovim, and various shell utilities. Supports b
 ```bash
 # Install git if not already installed
 # Then run:
-curl -fsSL https://raw.githubusercontent.com/<your-username>/dotfiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/GarrettMooney/dotfiles/main/bootstrap.sh | bash
 ```
 
 ### Manual Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/<your-username>/dotfiles.git ~/.dotfiles
+git clone https://github.com/GarrettMooney/dotfiles.git ~/.dotfiles
 
 # Run the installation script
 cd ~/.dotfiles
@@ -250,9 +250,36 @@ git push
 ├── tmux/
 │   └── tmux.conf
 ├── nvim/               # Neovim configuration (git submodule)
-└── bin/
-    └── tmux-sessionizer
+├── bin/
+│   └── tmux-sessionizer
+└── tests/              # Docker-based testing
+    ├── README.md
+    ├── Dockerfile.ubuntu
+    ├── Dockerfile.debian
+    ├── test-install.sh
+    └── run-docker-test.sh
 ```
+
+## Testing
+
+Docker-based tests are available to validate the installation on different Linux distributions:
+
+```bash
+# Test on all distributions
+./tests/run-docker-test.sh
+
+# Test on specific distribution
+./tests/run-docker-test.sh ubuntu
+./tests/run-docker-test.sh debian
+```
+
+The tests validate:
+- All dependencies are installed correctly
+- Dotfiles are properly symlinked
+- Shell configurations have valid syntax
+- Essential commands are available
+
+See [tests/README.md](tests/README.md) for more details.
 
 ## Troubleshooting
 

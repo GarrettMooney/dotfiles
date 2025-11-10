@@ -1,0 +1,27 @@
+# Test dotfiles installation on Debian
+FROM debian:bookworm-slim
+
+# Avoid interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/New_York
+
+# Install minimal dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user for testing
+RUN useradd -m -s /bin/bash testuser && \
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser
+
+# Set up git config
+RUN git config --global user.email "test@example.com" && \
+    git config --global user.name "Test User"
+
+CMD ["/bin/bash"]
