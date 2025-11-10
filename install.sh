@@ -90,6 +90,7 @@ install_macos_deps() {
         "git"
         "gh"
         "thefuck"
+        "just"
         "jq"
         "yq"
     )
@@ -206,6 +207,18 @@ install_linux_deps() {
             pip install --user thefuck
         else
             warn "pip not found. Please install thefuck manually."
+        fi
+    fi
+
+    # Install just (command runner)
+    if ! command_exists just; then
+        info "Installing just..."
+        if command_exists cargo; then
+            cargo install just
+        else
+            # Install precompiled binary
+            info "Installing just from GitHub releases..."
+            curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
         fi
     fi
 }

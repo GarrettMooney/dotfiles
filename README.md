@@ -50,6 +50,7 @@ Personal dotfiles for zsh, tmux, neovim, and various shell utilities. Supports b
 - **neovim** - Modern vim
 - **tmux** - Terminal multiplexer
 - **thefuck** - Command corrector
+- **just** - Command runner for project tasks
 - **nvm** - Node version manager
 - **rust/cargo** - Rust toolchain
 
@@ -86,7 +87,7 @@ The installation script will:
 #### macOS (via Homebrew)
 - zsh, zsh-autosuggestions, zsh-syntax-highlighting
 - fzf, ripgrep, eza, bat
-- direnv, zoxide, thefuck
+- direnv, zoxide, thefuck, just
 - neovim, tmux, git, gh, jq, yq
 
 #### Linux (via apt/dnf/pacman)
@@ -95,6 +96,7 @@ The installation script will:
 - build tools, curl, jq
 - neovim (latest appimage on Ubuntu)
 - eza (from community repos)
+- just (via cargo or precompiled binary)
 
 #### Cross-platform
 - oh-my-zsh
@@ -153,6 +155,41 @@ cd ~/.dotfiles
 vim zsh/zshrc
 ```
 
+## Managing Dotfiles with Just
+
+The repository includes a `justfile` for common tasks. Run `just` to see all available commands:
+
+```bash
+cd ~/.dotfiles
+just
+```
+
+### Available Commands
+
+- `just install` - Run the installation script
+- `just backup` - Backup existing dotfiles before making changes
+- `just update` - Pull latest changes from git and update submodules
+- `just link` - Create symlinks for all dotfiles
+- `just clean` - Remove all symlinks
+- `just test` - Test configurations (syntax check for zsh, tmux, check installed tools)
+- `just status` - Show the status of all dotfile symlinks
+
+### Examples
+
+```bash
+# Backup current dotfiles
+just backup
+
+# Update to latest version
+just update
+
+# Check if everything is properly linked
+just status
+
+# Test configurations before applying
+just test
+```
+
 ## Tmux Keybindings
 
 Prefix: `Ctrl+a`
@@ -199,6 +236,7 @@ git push
 ├── README.md
 ├── install.sh          # Main installation script
 ├── bootstrap.sh        # Quick bootstrap for fresh machines
+├── justfile            # Task runner commands
 ├── .gitignore
 ├── zsh/
 │   ├── zshrc
@@ -211,7 +249,7 @@ git push
 │   └── tokens.template
 ├── tmux/
 │   └── tmux.conf
-├── nvim/               # To be added
+├── nvim/               # Neovim configuration (git submodule)
 └── bin/
     └── tmux-sessionizer
 ```
