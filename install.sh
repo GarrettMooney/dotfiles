@@ -306,6 +306,12 @@ create_symlinks() {
         warn "nvim config not found in dotfiles. Skipping..."
     fi
 
+    # Symlink Claude Code skills
+    if [ -d "$DOTFILES_DIR/claude/skills/daily" ]; then
+        mkdir -p "$HOME/.claude/skills"
+        ln -sf "$DOTFILES_DIR/claude/skills/daily" "$HOME/.claude/skills/daily"
+    fi
+
     info "Symlinks created successfully"
 }
 
