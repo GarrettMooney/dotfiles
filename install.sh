@@ -318,6 +318,12 @@ create_symlinks() {
         ln -sf "$DOTFILES_DIR/claude/hooks/tmux-claude-title.sh" "$HOME/.claude/hooks/tmux-claude-title.sh"
     fi
 
+    # Symlink Claude Code settings (shared config; settings.local.json stays machine-local)
+    if [ -f "$DOTFILES_DIR/claude/settings.json" ]; then
+        mkdir -p "$HOME/.claude"
+        ln -sf "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+    fi
+
     info "Symlinks created successfully"
 }
 
