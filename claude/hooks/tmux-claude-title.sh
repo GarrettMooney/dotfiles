@@ -3,8 +3,11 @@
 # short label naming what the pane is for. Invoked from Claude Code hooks.
 #
 #   working  (UserPromptSubmit) -> "⏳ <label>"
-#   waiting  (Notification)     -> "🟡 <label>"
-#   done     (Stop)             -> "🟢 <label>"
+#   waiting  (Notification)     -> "🔔 <label>"
+#   done     (Stop)             -> "✅ <label>"
+#
+# Emojis are chosen to differ in SHAPE, not just hue (hourglass / bell / check), so
+# the state stays legible without relying on color (red-green colorblind friendly).
 #
 # The label is PINNED to the session's first meaningful prompt and then frozen, so
 # the title keeps telling you what the pane is about; only the emoji tracks state.
@@ -169,11 +172,11 @@ case "$mode" in
     ;;
   waiting)
     label=$(cat "$cache" 2>/dev/null || echo "waiting")
-    rename "🟡 $label"
+    rename "🔔 $label"
     ;;
   done)
     label=$(cat "$cache" 2>/dev/null || echo "done")
-    rename "🟢 $label"
+    rename "✅ $label"
     ;;
 esac
 
