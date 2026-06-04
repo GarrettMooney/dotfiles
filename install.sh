@@ -312,6 +312,12 @@ create_symlinks() {
         ln -sf "$DOTFILES_DIR/claude/skills/daily" "$HOME/.claude/skills/daily"
     fi
 
+    # Symlink Claude Code hooks
+    if [ -f "$DOTFILES_DIR/claude/hooks/tmux-claude-title.sh" ]; then
+        mkdir -p "$HOME/.claude/hooks"
+        ln -sf "$DOTFILES_DIR/claude/hooks/tmux-claude-title.sh" "$HOME/.claude/hooks/tmux-claude-title.sh"
+    fi
+
     info "Symlinks created successfully"
 }
 
