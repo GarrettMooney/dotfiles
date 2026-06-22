@@ -1,5 +1,8 @@
 # Ignore sensitive files
 .tokens
+# Machine-specific git identity (work email); only the .template is committed
+.gitconfig.local
+gitconfig.local
 
 # Ignore OS files
 .DS_Store

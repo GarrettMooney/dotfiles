@@ -1,0 +1,7 @@
+# Template for ~/.gitconfig.local
+# Copy this file to ~/.gitconfig.local and set your machine-specific git identity
+# (e.g. your work email on a work machine). DO NOT commit ~/.gitconfig.local.
+# install.sh copies this template into place on first run if ~/.gitconfig.local is absent.
+
+[user]
+	email = you@example.com

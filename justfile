@@ -16,7 +16,7 @@ backup:
     BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$BACKUP_DIR"
 
-    for file in .zshrc .aliases .functions .exports .extras .tmux.conf .ripgreprc .fzf.zsh; do
+    for file in .zshrc .aliases .functions .exports .extras .tmux.conf .ripgreprc .fzf.zsh .gitconfig .gitconfig-personal .gitmessage.txt; do
         if [ -f "$HOME/$file" ]; then
             cp "$HOME/$file" "$BACKUP_DIR/"
             echo "Backed up $file"
@@ -24,6 +24,10 @@ backup:
     done
 
     echo "Backup created at: $BACKUP_DIR"
+
+# Apply optional macOS defaults (opt-in; macOS only)
+macos:
+    ./macos.sh
 
 # Update dotfiles from repository
 update:
@@ -36,7 +40,7 @@ clean:
     set -euo pipefail
     echo "Removing symlinks..."
 
-    for file in .zshrc .aliases .functions .exports .extras .tmux.conf .ripgreprc .fzf.zsh; do
+    for file in .zshrc .aliases .functions .exports .extras .tmux.conf .ripgreprc .fzf.zsh .gitconfig .gitconfig-personal .gitmessage.txt; do
         if [ -L "$HOME/$file" ]; then
             rm "$HOME/$file"
             echo "Removed $file"
@@ -106,6 +110,15 @@ link:
     # Symlink tmux
     ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
+    # Symlink git config
+    ln -sf "$DOTFILES_DIR/git/gitconfig" "$HOME/.gitconfig"
+    ln -sf "$DOTFILES_DIR/git/gitconfig-personal" "$HOME/.gitconfig-personal"
+    ln -sf "$DOTFILES_DIR/git/gitmessage.txt" "$HOME/.gitmessage.txt"
+    if [ ! -f "$HOME/.gitconfig.local" ]; then
+        cp "$DOTFILES_DIR/git/gitconfig.local.template" "$HOME/.gitconfig.local"
+        echo "Created ~/.gitconfig.local from template. Edit it to set your work email."
+    fi
+
     # Symlink bin scripts
     ln -sf "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"
     chmod +x "$HOME/.local/bin/tmux-sessionizer"
@@ -124,7 +137,7 @@ status:
     echo "Dotfiles symlink status:"
     echo ""
 
-    for file in .zshrc .aliases .functions .exports .extras .tmux.conf .ripgreprc .fzf.zsh; do
+    for file in .zshrc .aliases .functions .exports .extras .tmux.conf .ripgreprc .fzf.zsh .gitconfig .gitconfig-personal .gitmessage.txt; do
         if [ -L "$HOME/$file" ]; then
             target=$(readlink "$HOME/$file")
             echo "✓ $file -> $target"

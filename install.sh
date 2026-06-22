@@ -41,7 +41,7 @@ backup_dotfiles() {
     BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$BACKUP_DIR"
 
-    local files=(".zshrc" ".aliases" ".functions" ".exports" ".extras" ".tmux.conf" ".ripgreprc" ".fzf.zsh")
+    local files=(".zshrc" ".aliases" ".functions" ".exports" ".extras" ".tmux.conf" ".ripgreprc" ".fzf.zsh" ".gitconfig" ".gitconfig-personal" ".gitmessage.txt")
     for file in "${files[@]}"; do
         if [ -f "$HOME/$file" ]; then
             cp "$HOME/$file" "$BACKUP_DIR/"
@@ -74,36 +74,15 @@ install_macos_deps() {
         info "Homebrew already installed"
     fi
 
-    # Install packages
-    local packages=(
-        "zsh"
-        "zsh-autosuggestions"
-        "zsh-syntax-highlighting"
-        "fzf"
-        "ripgrep"
-        "eza"
-        "bat"
-        "direnv"
-        "zoxide"
-        "neovim"
-        "tmux"
-        "git"
-        "gh"
-        "thefuck"
-        "just"
-        "jq"
-        "yq"
-    )
-
-    info "Installing Homebrew packages..."
-    for package in "${packages[@]}"; do
-        if brew list "$package" &>/dev/null; then
-            info "$package already installed"
-        else
-            info "Installing $package..."
-            brew install "$package"
-        fi
-    done
+    # Install packages from the Brewfile (formulae, casks, Mac App Store, VS Code extensions)
+    local DOTFILES_DIR
+    DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "$DOTFILES_DIR/Brewfile" ]; then
+        info "Installing packages from Brewfile..."
+        brew bundle --file="$DOTFILES_DIR/Brewfile"
+    else
+        warn "No Brewfile found at $DOTFILES_DIR/Brewfile; skipping brew bundle"
+    fi
 }
 
 # Install dependencies for Linux
@@ -293,6 +272,16 @@ create_symlinks() {
 
     # Symlink tmux
     ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
+
+    # Symlink git config (work-default identity; personal override for ~/personal/)
+    ln -sf "$DOTFILES_DIR/git/gitconfig" "$HOME/.gitconfig"
+    ln -sf "$DOTFILES_DIR/git/gitconfig-personal" "$HOME/.gitconfig-personal"
+    ln -sf "$DOTFILES_DIR/git/gitmessage.txt" "$HOME/.gitmessage.txt"
+    # Machine-specific git identity (e.g. work email) lives in ~/.gitconfig.local, never committed.
+    if [ ! -f "$HOME/.gitconfig.local" ]; then
+        cp "$DOTFILES_DIR/git/gitconfig.local.template" "$HOME/.gitconfig.local"
+        warn "Created ~/.gitconfig.local from template. Edit it to set your work email."
+    fi
 
     # Symlink bin scripts
     ln -sf "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"

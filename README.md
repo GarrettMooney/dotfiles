@@ -20,7 +20,18 @@ Personal dotfiles for zsh, tmux, neovim, and various shell utilities. Supports b
   - `tmux-sessionizer` - Quick project switching script
 
 ### Editor
-- **nvim**: Neovim configuration (to be added)
+- **nvim**: Neovim configuration (git submodule)
+
+### Git
+- **git**: Version control configuration
+  - `gitconfig` - Global config; work email as default (set in untracked `~/.gitconfig.local`)
+  - `gitconfig-personal` - Personal identity, used automatically for repos under `~/personal/`
+  - `gitconfig.local.template` - Template for your machine-specific email
+  - `gitmessage.txt` - Commit message template
+
+### Packages
+- **Brewfile**: macOS packages (formulae, casks, VS Code extensions) via `brew bundle`
+- **macos.sh**: Optional macOS system defaults (`just macos`)
 
 ## Features
 
@@ -85,10 +96,9 @@ The installation script will:
 ### What Gets Installed
 
 #### macOS (via Homebrew)
-- zsh, zsh-autosuggestions, zsh-syntax-highlighting
-- fzf, ripgrep, eza, bat
-- direnv, zoxide, thefuck, just
-- neovim, tmux, git, gh, jq, yq
+Packages are declared in the [`Brewfile`](Brewfile) and installed with `brew bundle`:
+formulae (CLI tools), casks (GUI apps), and VS Code extensions. Edit the `Brewfile`
+to add or remove packages. Add `mas "App", id: NNN` lines for Mac App Store apps.
 
 #### Linux (via apt/dnf/pacman)
 - zsh, fzf, ripgrep, bat
@@ -119,6 +129,21 @@ The installation script will:
    ```
 
 3. The `.tokens` file is gitignored and will not be committed
+
+### Setting up Git Identity
+
+The global git identity defaults to work; your work email lives in an untracked
+`~/.gitconfig.local` (created from `git/gitconfig.local.template` on first run):
+
+```bash
+# Edit the email written on first run, or create it manually:
+cp ~/.dotfiles/git/gitconfig.local.template ~/.gitconfig.local
+vim ~/.gitconfig.local
+```
+
+Repositories under `~/personal/` automatically use the personal identity via an
+`includeIf` rule, so personal projects are committed with your personal email
+without any per-repo setup. `~/.gitconfig.local` is never committed.
 
 ### Neovim Setup
 
@@ -173,6 +198,7 @@ just
 - `just clean` - Remove all symlinks
 - `just test` - Test configurations (syntax check for zsh, tmux, check installed tools)
 - `just status` - Show the status of all dotfile symlinks
+- `just macos` - Apply optional macOS system defaults (macOS only)
 
 ### Examples
 
@@ -234,9 +260,12 @@ git push
 ```
 .
 ├── README.md
+├── CHECKLIST.md        # Manual steps for a new machine
 ├── install.sh          # Main installation script
 ├── bootstrap.sh        # Quick bootstrap for fresh machines
 ├── justfile            # Task runner commands
+├── Brewfile            # macOS packages (brew bundle)
+├── macos.sh            # Optional macOS defaults
 ├── .gitignore
 ├── zsh/
 │   ├── zshrc
@@ -247,6 +276,11 @@ git push
 │   ├── ripgreprc
 │   ├── fzf.zsh
 │   └── tokens.template
+├── git/
+│   ├── gitconfig
+│   ├── gitconfig-personal
+│   ├── gitconfig.local.template
+│   └── gitmessage.txt
 ├── tmux/
 │   └── tmux.conf
 ├── nvim/               # Neovim configuration (git submodule)
