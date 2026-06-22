@@ -291,6 +291,11 @@ create_symlinks() {
     ln -sf "$DOTFILES_DIR/zsh/ripgreprc" "$HOME/.ripgreprc"
     ln -sf "$DOTFILES_DIR/zsh/fzf.zsh" "$HOME/.fzf.zsh"
 
+    # Symlink machine index (annotated map of ~/git, ~/personal, ~/.claude)
+    if [ -f "$DOTFILES_DIR/INDEX.md" ]; then
+        ln -sf "$DOTFILES_DIR/INDEX.md" "$HOME/INDEX.md"
+    fi
+
     # Symlink tmux
     ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 

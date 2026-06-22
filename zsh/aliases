@@ -66,3 +66,7 @@ alias vim="$VIM"
 
 # justfiles
 alias kmd="just -g"
+
+# claude: simple mode for brainstorming / rough drafts
+# loads CLAUDE.md but drops the agentic harness, hooks, and skill-heavy loops
+alias cs="CLAUDE_CODE_SIMPLE=1 claude"
