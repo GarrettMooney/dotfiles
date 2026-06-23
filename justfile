@@ -81,6 +81,11 @@ clean:
         echo "Removed nvim config"
     fi
 
+    if [ -L "$HOME/.config/git/ignore" ]; then
+        rm "$HOME/.config/git/ignore"
+        echo "Removed global gitignore"
+    fi
+
     echo "Symlinks removed"
 
 # Test dotfiles configuration
@@ -142,6 +147,8 @@ link:
         cp "$DOTFILES_DIR/git/gitconfig.local.template" "$HOME/.gitconfig.local"
         echo "Created ~/.gitconfig.local from template. Edit it to set your work email."
     fi
+    mkdir -p "$HOME/.config/git"
+    ln -sf "$DOTFILES_DIR/git/ignore" "$HOME/.config/git/ignore"
 
     # Symlink bin scripts
     for script in "$DOTFILES_DIR"/bin/*; do

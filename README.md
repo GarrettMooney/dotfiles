@@ -288,7 +288,8 @@ git push
 │   ├── gitconfig
 │   ├── gitconfig-personal
 │   ├── gitconfig.local.template
-│   └── gitmessage.txt
+│   ├── gitmessage.txt
+│   └── ignore          # global gitignore -> ~/.config/git/ignore
 ├── tmux/
 │   └── tmux.conf
 ├── nvim/               # Neovim configuration (git submodule)

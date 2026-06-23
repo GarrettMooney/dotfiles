@@ -282,6 +282,9 @@ create_symlinks() {
         cp "$DOTFILES_DIR/git/gitconfig.local.template" "$HOME/.gitconfig.local"
         warn "Created ~/.gitconfig.local from template. Edit it to set your work email."
     fi
+    # Global gitignore (git reads ~/.config/git/ignore as core.excludesfile by default)
+    mkdir -p "$HOME/.config/git"
+    ln -sf "$DOTFILES_DIR/git/ignore" "$HOME/.config/git/ignore"
 
     # Symlink bin scripts
     for script in "$DOTFILES_DIR"/bin/*; do
