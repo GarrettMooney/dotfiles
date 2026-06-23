@@ -1,0 +1,30 @@
+[user]
+	name = Garrett Mooney
+# Work email is set in ~/.gitconfig.local (see git/gitconfig.local.template); not committed.
+[include]
+	path = ~/.gitconfig.local
+[init]
+	defaultBranch = main
+# Repositories under ~/personal/ use the personal identity.
+[includeIf "gitdir:~/personal/"]
+	path = ~/.gitconfig-personal
+[pull]
+	rebase = true
+[push]
+	autoSetupRemote = true
+[core]
+	editor = nvim
+[commit]
+	template = ~/.gitmessage.txt
+[alias]
+	lol = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	undo = reset --soft HEAD^
+	; reset repo-local identity so the global (work) default applies
+	work = !git config --local --unset-all user.email 2>/dev/null; git config --local --unset-all user.name 2>/dev/null; true
+	personal = !git config user.name "Garrett Mooney" && git config user.email "garrettrmooney@gmail.com"
+	fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

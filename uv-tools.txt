@@ -1,0 +1,35 @@
+# uv tools to install on a new machine (one package per line).
+# Reinstalled by install.sh via `uv tool install`. Lines starting with # are ignored.
+# Note: mlx / mlx-lm are Apple Silicon only and are skipped on other platforms.
+black
+datasette
+files-to-prompt
+gsutil
+httpie
+httpx
+ipython
+isort
+jupyter-core
+keyring
+kfp
+llm
+marimo
+maturin
+mlx
+mlx-lm
+modal
+pip
+pre-commit
+prefect
+ruff
+sigil-sh
+skedulord
+strip-tags
+symbex
+termtosvg
+thefuck
+tldr
+ttok
+ty
+uvicorn
+yt-dlp

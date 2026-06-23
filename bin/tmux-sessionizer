@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+
+# tmux's run-shell uses a minimal PATH that omits Homebrew and ~/.fzf, so the
+# bare `tmux`/`fzf` calls below would fail when invoked from a key binding.
+# Prepend the dirs that hold them so the script works regardless of how the
+# tmux server's environment was set up.
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$HOME/.fzf/bin:$PATH"
+
 switch_to() {
     if [[ -z $TMUX ]]; then
         tmux attach-session -t $1
