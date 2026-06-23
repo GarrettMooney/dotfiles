@@ -35,8 +35,8 @@ Personal dotfiles for zsh, tmux, neovim, and various shell utilities. Supports b
 - **uv-tools.txt**: uv-managed CLI tools reinstalled with `uv tool install` (`just uv-tools`)
 
 ### Scripts
-- **bin/**: Custom scripts symlinked into `~/.local/bin` (tmux-sessionizer, local-LLM
-  helpers, image/book utilities)
+- **bin/**: Custom scripts symlinked into `~/.local/bin` (tmux-sessionizer,
+  rename-pictures)
 
 ## Features
 
@@ -295,9 +295,6 @@ git push
 ├── nvim/               # Neovim configuration (git submodule)
 ├── bin/                # Custom scripts symlinked into ~/.local/bin
 │   ├── tmux-sessionizer
-│   ├── gemma
-│   ├── model
-│   ├── calibre-auto-import.sh
 │   └── rename-pictures.sh
 └── tests/              # Docker-based testing
     ├── README.md
