@@ -29,6 +29,27 @@ backup:
 macos:
     ./macos.sh
 
+# Install uv-managed CLI tools listed in uv-tools.txt
+uv-tools:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    grep -vE '^\s*(#|$)' uv-tools.txt | while read -r tool; do
+        echo "uv tool install $tool"
+        uv tool install "$tool" || echo "  (failed: $tool, continuing)"
+    done
+
+# Refresh uv-tools.txt from the currently installed uv tools
+uv-tools-freeze:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    {
+        echo "# uv tools to install on a new machine (one package per line)."
+        echo "# Reinstalled by install.sh via \`uv tool install\`. Lines starting with # are ignored."
+        echo "# Note: mlx / mlx-lm are Apple Silicon only and are skipped on other platforms."
+        uv tool list | grep -vE '^-' | awk '{print $1}' | sort -u
+    } > uv-tools.txt
+    echo "Wrote uv-tools.txt"
+
 # Update dotfiles from repository
 update:
     git pull --rebase
@@ -47,10 +68,13 @@ clean:
         fi
     done
 
-    if [ -L "$HOME/.local/bin/tmux-sessionizer" ]; then
-        rm "$HOME/.local/bin/tmux-sessionizer"
-        echo "Removed tmux-sessionizer"
-    fi
+    for script in bin/*; do
+        name=$(basename "$script")
+        if [ -L "$HOME/.local/bin/$name" ]; then
+            rm "$HOME/.local/bin/$name"
+            echo "Removed $name"
+        fi
+    done
 
     if [ -L "$HOME/.config/nvim" ]; then
         rm "$HOME/.config/nvim"
@@ -120,8 +144,11 @@ link:
     fi
 
     # Symlink bin scripts
-    ln -sf "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"
-    chmod +x "$HOME/.local/bin/tmux-sessionizer"
+    for script in "$DOTFILES_DIR"/bin/*; do
+        [ -f "$script" ] || continue
+        chmod +x "$script"
+        ln -sf "$script" "$HOME/.local/bin/$(basename "$script")"
+    done
 
     # Symlink neovim config
     if [ -d "$DOTFILES_DIR/nvim" ]; then
@@ -149,12 +176,15 @@ status:
     done
 
     echo ""
-    if [ -L "$HOME/.local/bin/tmux-sessionizer" ]; then
-        target=$(readlink "$HOME/.local/bin/tmux-sessionizer")
-        echo "✓ tmux-sessionizer -> $target"
-    else
-        echo "✗ tmux-sessionizer not linked"
-    fi
+    for script in bin/*; do
+        name=$(basename "$script")
+        if [ -L "$HOME/.local/bin/$name" ]; then
+            target=$(readlink "$HOME/.local/bin/$name")
+            echo "✓ $name -> $target"
+        else
+            echo "✗ $name not linked"
+        fi
+    done
 
     echo ""
     if [ -L "$HOME/.config/nvim" ]; then

@@ -103,6 +103,8 @@ brew "jq"
 brew "just"
 
 # --- Language runtimes ---
+# Extremely fast Python package installer and resolver, and tool manager
+brew "uv"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
 # Fast, disk space efficient package manager

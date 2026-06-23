@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Launch / switch the local Gemma 4 llama-server between context modes.
+# Usage: gemma [snappy|long|stop|status]
+#   snappy  -> 32k context, fast startup (default for interactive coding)
+#   long    -> 128k context, q8_0 KV-cache quant (slow prefill, big inputs)
+#   stop    -> kill whatever holds port 8080
+#   status  -> show running model + live context size
+set -euo pipefail
+
+PORT=8080
+GLOB=(~/.cache/huggingface/hub/models--google--gemma-4-12B-it-qat-q4_0-gguf/snapshots/*/)
+DIR="${GLOB[0]%/}"
+MODEL="$DIR/gemma-4-12b-it-qat-q4_0.gguf"
+MMPROJ="$DIR/mmproj-gemma-4-12b-it-qat-q4_0.gguf"
+LOG=/tmp/llama-gemma.log
+
+stop() {
+  local pid
+  pid=$(lsof -tiTCP:$PORT -sTCP:LISTEN 2>/dev/null || true)
+  [ -n "$pid" ] && { kill "$pid"; echo "stopped pid $pid on :$PORT"; sleep 1; } || echo "nothing on :$PORT"
+}
+
+status() {
+  if curl -sf "http://localhost:$PORT/props" >/dev/null 2>&1; then
+    curl -s "http://localhost:$PORT/props" | python3 -c "import sys,json;d=json.load(sys.stdin);print('model:',d.get('model_alias'),'| n_ctx:',d['default_generation_settings']['n_ctx'])"
+  else
+    echo "no server on :$PORT"
+  fi
+}
+
+start() {
+  local ctx="$1"; shift
+  stop
+  echo "starting gemma-4-12b at ${ctx} ctx ..."
+  nohup llama-server -m "$MODEL" --mmproj "$MMPROJ" --jinja \
+    --host 127.0.0.1 --port "$PORT" -c "$ctx" -np 1 -fa on -ngl 99 \
+    --alias gemma-4-12b "$@" > "$LOG" 2>&1 &
+  for _ in $(seq 1 90); do
+    curl -sf "http://localhost:$PORT/health" 2>/dev/null | grep -q '"ok"' && { echo "ready."; status; return; }
+    sleep 1
+  done
+  echo "timed out waiting for health; check $LOG"; return 1
+}
+
+case "${1:-status}" in
+  snappy) start 32768 ;;
+  long)   start 131072 --cache-type-k q8_0 --cache-type-v q8_0 ;;
+  stop)   stop ;;
+  status) status ;;
+  *) echo "usage: gemma [snappy|long|stop|status]"; exit 1 ;;
+esac

@@ -32,6 +32,11 @@ Personal dotfiles for zsh, tmux, neovim, and various shell utilities. Supports b
 ### Packages
 - **Brewfile**: macOS packages (formulae, casks, VS Code extensions) via `brew bundle`
 - **macos.sh**: Optional macOS system defaults (`just macos`)
+- **uv-tools.txt**: uv-managed CLI tools reinstalled with `uv tool install` (`just uv-tools`)
+
+### Scripts
+- **bin/**: Custom scripts symlinked into `~/.local/bin` (tmux-sessionizer, local-LLM
+  helpers, image/book utilities)
 
 ## Features
 
@@ -199,6 +204,8 @@ just
 - `just test` - Test configurations (syntax check for zsh, tmux, check installed tools)
 - `just status` - Show the status of all dotfile symlinks
 - `just macos` - Apply optional macOS system defaults (macOS only)
+- `just uv-tools` - Install uv-managed CLI tools from `uv-tools.txt`
+- `just uv-tools-freeze` - Regenerate `uv-tools.txt` from currently installed uv tools
 
 ### Examples
 
@@ -266,6 +273,7 @@ git push
 ├── justfile            # Task runner commands
 ├── Brewfile            # macOS packages (brew bundle)
 ├── macos.sh            # Optional macOS defaults
+├── uv-tools.txt        # uv-managed CLI tools (uv tool install)
 ├── .gitignore
 ├── zsh/
 │   ├── zshrc
@@ -284,8 +292,12 @@ git push
 ├── tmux/
 │   └── tmux.conf
 ├── nvim/               # Neovim configuration (git submodule)
-├── bin/
-│   └── tmux-sessionizer
+├── bin/                # Custom scripts symlinked into ~/.local/bin
+│   ├── tmux-sessionizer
+│   ├── gemma
+│   ├── model
+│   ├── calibre-auto-import.sh
+│   └── rename-pictures.sh
 └── tests/              # Docker-based testing
     ├── README.md
     ├── Dockerfile.ubuntu

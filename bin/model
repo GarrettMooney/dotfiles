@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# Switch the local llama-server between downloaded GGUF models (one at a time on :8080).
+# Usage:
+#   model <name> [ctx|long]   start a model (optional context size or "long" = 131072)
+#   model list                show known models
+#   model status              show running model + live context
+#   model stop                stop the server
+#
+# Known names: gemma, qwen, gpt-oss  (only models whose tool calls parse in pi)
+# Contexts >65536 automatically get q8_0 KV-cache quantization to save RAM.
+# After switching, pi auto-detects the new model via /props (restart pi / /reload
+# if it was already open). Select it with: pi --provider llama --model <alias>
+set -euo pipefail
+
+PORT=8080
+HUB="$HOME/.cache/huggingface/hub"
+LOG=/tmp/llama-gemma.log
+
+# name -> sets MODEL, MMPROJ (optional), ALIAS, DEFCTX. Globs expand under bash.
+resolve() {
+  local name="$1" files mfiles
+  MMPROJ=""
+  case "$name" in
+    gemma)
+      files=( "$HUB"/models--google--gemma-4-12B-it-qat-q4_0-gguf/snapshots/*/gemma-4-12b-it-qat-q4_0.gguf )
+      mfiles=( "$HUB"/models--google--gemma-4-12B-it-qat-q4_0-gguf/snapshots/*/mmproj-gemma-4-12b-it-qat-q4_0.gguf )
+      MMPROJ="${mfiles[0]}"; ALIAS="gemma-4-12b"; DEFCTX=32768 ;;
+    qwen)
+      files=( "$HUB"/models--bartowski--Qwen2.5-7B-Instruct-GGUF/snapshots/*/Qwen2.5-7B-Instruct-Q4_K_M.gguf )
+      ALIAS="qwen2.5-7b"; DEFCTX=32768 ;;
+    gpt-oss)
+      files=( "$HUB"/models--ggml-org--gpt-oss-20b-GGUF/snapshots/*/gpt-oss-20b-mxfp4.gguf )
+      ALIAS="gpt-oss-20b"; DEFCTX=32768 ;;
+    *)
+      echo "unknown model: $name (try: model list)" >&2; return 2 ;;
+  esac
+  MODEL="${files[0]}"
+  [ -f "$MODEL" ] || { echo "GGUF not found for '$name': $MODEL" >&2; return 3; }
+}
+
+stop() {
+  local pid
+  pid=$(lsof -tiTCP:$PORT -sTCP:LISTEN 2>/dev/null || true)
+  if [ -n "$pid" ]; then kill "$pid"; echo "stopped pid $pid on :$PORT"; sleep 1
+  else echo "nothing on :$PORT"; fi
+}
+
+status() {
+  if curl -sf "http://localhost:$PORT/props" >/dev/null 2>&1; then
+    curl -s "http://localhost:$PORT/props" | python3 -c "import sys,json;d=json.load(sys.stdin);print('running:',d.get('model_alias'),'| n_ctx:',d['default_generation_settings']['n_ctx'],'| vision:',bool(d.get('modalities',{}).get('vision')))"
+  else
+    echo "no server on :$PORT"
+  fi
+}
+
+start() {
+  local name="$1" ctxarg="${2:-}" ctx
+  resolve "$name"
+  case "$ctxarg" in
+    "")    ctx="$DEFCTX" ;;
+    long)  ctx=131072 ;;
+    *[!0-9]*) echo "context must be a number or 'long'" >&2; return 1 ;;
+    *)     ctx="$ctxarg" ;;
+  esac
+
+  local extra=()
+  [ -n "$MMPROJ" ] && [ -f "$MMPROJ" ] && extra+=(--mmproj "$MMPROJ")
+  [ "$ctx" -gt 65536 ] && extra+=(--cache-type-k q8_0 --cache-type-v q8_0)
+
+  stop
+  echo "starting $name ($ALIAS) at ${ctx} ctx ..."
+  nohup llama-server -m "$MODEL" "${extra[@]}" --jinja \
+    --host 127.0.0.1 --port "$PORT" -c "$ctx" -np 1 -fa on -ngl 99 \
+    --alias "$ALIAS" > "$LOG" 2>&1 &
+  for _ in $(seq 1 120); do
+    curl -sf "http://localhost:$PORT/health" 2>/dev/null | grep -q '"ok"' && { echo "ready."; status; return; }
+    sleep 1
+  done
+  echo "timed out waiting for health; check $LOG" >&2; return 1
+}
+
+list() {
+  printf "%-10s %-14s %s\n" NAME ALIAS NOTES
+  printf "%-10s %-14s %s\n" gemma   gemma-4-12b "Q4_0 (google QAT); vision; 'long'=128k, native 256k"
+  printf "%-10s %-14s %s\n" qwen    qwen2.5-7b  "general"
+  printf "%-10s %-14s %s\n" gpt-oss gpt-oss-20b "reasoning; native 128k; heaviest"
+}
+
+case "${1:-status}" in
+  list)   list ;;
+  status) status ;;
+  stop)   stop ;;
+  -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *)      start "$1" "${2:-}" ;;
+esac

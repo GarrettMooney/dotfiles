@@ -284,8 +284,11 @@ create_symlinks() {
     fi
 
     # Symlink bin scripts
-    ln -sf "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"
-    chmod +x "$HOME/.local/bin/tmux-sessionizer"
+    for script in "$DOTFILES_DIR"/bin/*; do
+        [ -f "$script" ] || continue
+        chmod +x "$script"
+        ln -sf "$script" "$HOME/.local/bin/$(basename "$script")"
+    done
 
     # Symlink neovim config
     if [ -d "$DOTFILES_DIR/nvim" ]; then
@@ -307,6 +310,35 @@ change_shell() {
     else
         info "Default shell is already zsh"
     fi
+}
+
+# Install uv-managed CLI tools listed in uv-tools.txt
+install_uv_tools() {
+    local DOTFILES_DIR
+    DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local list="$DOTFILES_DIR/uv-tools.txt"
+
+    if ! command_exists uv; then
+        warn "uv not found; skipping uv tool installation"
+        return
+    fi
+    if [ ! -f "$list" ]; then
+        warn "No uv-tools.txt found; skipping uv tool installation"
+        return
+    fi
+
+    info "Installing uv tools from uv-tools.txt..."
+    while IFS= read -r tool; do
+        # Skip blank lines and comments
+        case "$tool" in ''|\#*) continue ;; esac
+        # mlx / mlx-lm are Apple Silicon only
+        if { [ "$tool" = "mlx" ] || [ "$tool" = "mlx-lm" ]; } && [ "$MACHINE" != "Mac" ]; then
+            info "Skipping $tool (Apple Silicon only)"
+            continue
+        fi
+        info "uv tool install $tool"
+        uv tool install "$tool" || warn "Failed to install $tool (continuing)"
+    done < "$list"
 }
 
 # Main installation
@@ -331,6 +363,7 @@ main() {
     install_rust
     install_nvm
     install_fzf
+    install_uv_tools
 
     # Create symlinks
     create_symlinks
