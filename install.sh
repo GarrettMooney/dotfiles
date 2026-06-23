@@ -311,10 +311,13 @@ create_symlinks() {
         warn "nvim config not found in dotfiles. Skipping..."
     fi
 
-    # Symlink Claude Code skills
-    if [ -d "$DOTFILES_DIR/claude/skills/daily" ]; then
+    # Symlink Claude Code skills (every skill under claude/skills/)
+    if [ -d "$DOTFILES_DIR/claude/skills" ]; then
         mkdir -p "$HOME/.claude/skills"
-        ln -sf "$DOTFILES_DIR/claude/skills/daily" "$HOME/.claude/skills/daily"
+        for skill in "$DOTFILES_DIR"/claude/skills/*/; do
+            [ -f "$skill/SKILL.md" ] || continue
+            ln -sfn "$skill" "$HOME/.claude/skills/$(basename "$skill")"
+        done
     fi
 
     # Symlink Claude Code hooks
