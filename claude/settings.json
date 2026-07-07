@@ -2,6 +2,11 @@
   "env": {
     "ENABLE_TOOL_SEARCH": "true"
   },
+  "permissions": {
+    "deny": [
+      "Read(~/.tokens)"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -51,6 +56,17 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r \".tool_input.command // empty\" | grep -qE \"(~|\\\\\\$HOME|$HOME)/\\.tokens\" && echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"deny\\\",\\\"permissionDecisionReason\\\":\\\"~/.tokens is blocked by user policy\\\"}}\" || true"
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
@@ -58,7 +74,9 @@
     "mgrep@Mixedbread-Grep": true,
     "evals-skills@hamelsmu-evals-skills": true,
     "frontend-slides@frontend-slides": true,
-    "astral@astral-sh": true
+    "astral@astral-sh": true,
+    "gog-cli@intellectronica-skills": true,
+    "elements-of-style@superpowers-marketplace": true
   },
   "extraKnownMarketplaces": {
     "hamelsmu-evals-skills": {
@@ -78,12 +96,20 @@
         "source": "github",
         "repo": "astral-sh/claude-code-plugins"
       }
+    },
+    "intellectronica-skills": {
+      "source": {
+        "source": "github",
+        "repo": "intellectronica/agent-skills"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "theme": "dark-daltonized",
   "autoCompactEnabled": false,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "remoteControlAtStartup": true
 }
